@@ -2,7 +2,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>:root{color-scheme:light} body{margin:0;font:14px system-ui,sans-serif;background:#F2F5FA}
 img{max-width:100%} [hidden]{display:none!important}</style></head><body>
-<title>文法理解度チェックアプリ</title>
+<title>文法理解度チェックアプリ（解答入力版）</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
@@ -273,6 +273,7 @@ img{max-width:100%} [hidden]{display:none!important}</style></head><body>
     border-bottom:1px solid var(--ink-3);
     margin:0 .25em;vertical-align:baseline;
   }
+  .blank.ref{min-width:2.4em}
   .ex .blank{min-width:6.5em;border-bottom-color:var(--ink-2);margin-left:0}
   .prompt .pick{
     color:var(--ink);background:var(--panel-2);
@@ -341,6 +342,49 @@ img{max-width:100%} [hidden]{display:none!important}</style></head><body>
     border:1px solid currentColor;margin-left:8px;vertical-align:2px;
   }
 
+  /* ---------- 解答入力 ---------- */
+  :root{--ok:#1F7A4D;--ok-soft:#E3F3EA}
+  :root[data-app-theme="dark"]{--ok:#62CF98;--ok-soft:#173326}
+  .bk{
+    font:inherit;color:var(--ink);background:var(--panel);
+    border:0;border-bottom:1.5px solid var(--ink-3);border-radius:2px 2px 0 0;
+    min-width:5.5em;width:6.5em;max-width:100%;padding:1px 6px;margin:0 .2em;
+    vertical-align:baseline;outline:none;transition:background .15s,border-color .15s;
+  }
+  .ex .bk{font-family:var(--en);font-size:16px}
+  .jp-bk{font-family:var(--jp);font-size:14px}
+  .bk:focus{border-bottom-color:var(--red);background:var(--red-soft)}
+  .bk.ok{border-bottom-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+  .bk.ng{border-bottom-color:var(--red);background:var(--red-soft);color:var(--red-ink)}
+  .pk{display:inline-flex;align-items:center;gap:4px;margin:0 .25em;vertical-align:baseline;flex-wrap:wrap}
+  .pk-s{color:var(--ink-3);font-size:12px}
+  .pk-o{font-family:var(--jp);font-size:13px;padding:2px 9px;border:1px solid var(--rule);background:var(--panel-2);color:var(--ink-2);border-radius:99px}
+  .pk-o:hover{border-color:var(--ink-3);color:var(--ink)}
+  .pk-o[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--panel)}
+  .pk-o.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+  .pk-o.ng{background:var(--red);border-color:var(--red);color:var(--on-red)}
+  .free{font:inherit;font-size:14px;width:100%;padding:8px 10px;border:1px solid var(--rule);border-radius:3px;background:var(--panel);color:var(--ink);resize:vertical}
+  .free:focus{outline:none;border-color:var(--red)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}
+  .check{background:var(--red);border:1px solid var(--red);color:var(--on-red);padding:8px 18px;font-weight:600;letter-spacing:.06em}
+  .check:hover{filter:brightness(1.06)}
+  .model{background:transparent;border:1px solid var(--rule);color:var(--ink-2);padding:8px 16px;font-weight:600}
+  .model:hover{border-color:var(--ink-3);color:var(--ink)}
+  .verdict{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;font-size:13px;min-height:0}
+  .verdict:empty{display:none}
+  .v-ok{color:var(--ok);font-weight:700}
+  .v-ng{color:var(--red);font-weight:700}
+  .v-msg{color:var(--ink-2);font-size:12.5px}
+  .self{padding:4px 12px;font-size:12.5px;border:1px solid var(--rule);background:var(--panel);color:var(--ink-2)}
+  .self.ok:hover{border-color:var(--ok);color:var(--ok)}
+  .self.ng:hover{border-color:var(--red);color:var(--red)}
+  .item.ok{border-color:var(--ok)}
+  .item.ok .num{border-color:var(--ok);color:var(--ok)}
+  .item.ng .num{border-color:var(--red);color:var(--red)}
+  .count .graded{color:var(--ink-3);font-size:12px;margin-left:4px}
+  .placeholder{text-align:center;line-height:1.7}
+  @media (max-width:760px){ .actions button{flex:1} .tools{flex-wrap:wrap} }
+
   /* ---------- legend ---------- */
   .legend{margin-top:34px;padding-top:22px;border-top:1px solid var(--rule)}
   .keys{display:flex;flex-wrap:wrap;gap:8px 20px;margin:0;padding:0;list-style:none;font-size:13px}
@@ -376,7 +420,7 @@ img{max-width:100%} [hidden]{display:none!important}</style></head><body>
   </div>
 
   <div class="toolbar">
-    <span class="count"><b id="done">0</b> / <span id="total">0</span> 問 確認済み</span>
+    <span class="count">正解 <b id="done">0</b> / <span id="total">0</span> 問<span class="graded">（採点済み <span id="graded">0</span>）</span></span>
     <span class="track"><span id="bar"></span></span>
     <span class="tools">
       <button class="ghost theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="ダークモードに切り替え">
@@ -384,8 +428,10 @@ img{max-width:100%} [hidden]{display:none!important}</style></head><body>
         <svg class="ic-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2 12h2.2M19.8 12H22M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>
         <span id="themeLabel">ダーク</span>
       </button>
-      <button class="ghost" id="showAll" type="button">すべて表示</button>
-      <button class="ghost" id="hideAll" type="button">すべて隠す</button>
+      <button class="ghost" id="checkAll" type="button">まとめて採点</button>
+      <button class="ghost" id="showAll" type="button">答えをすべて表示</button>
+      <button class="ghost" id="hideAll" type="button">答えを隠す</button>
+      <button class="ghost" id="resetAll" type="button">リセット</button>
     </span>
   </div>
 
@@ -399,7 +445,7 @@ img{max-width:100%} [hidden]{display:none!important}</style></head><body>
       <li><span class="sw" style="background:var(--pos-adj)"></span>形容詞（名詞を修飾）</li>
       <li><span class="sw" style="background:var(--pos-adv)"></span>副詞・副詞句（動詞や形容詞を修飾）</li>
     </ul>
-    <footer>ボタンを押すと、その設問の答えだけが右側に表示されます。</footer>
+    <footer>空欄に答えを入力（Enter で次の欄へ、最後の欄で答え合わせ）。選択肢はタップで選びます。「答え合わせ」で正誤、「モデルアンサー」で正解が右側に表示されます。訳・説明など自由記述の設問は、モデルアンサーを見て自己採点してください。</footer>
   </section>
 </div>
 
@@ -439,8 +485,8 @@ const LESSONS = [
   },
   {
     sec:"3. 形容詞の働き",
-    prompt:'形容詞は、名詞の a) 性質や b) 状態を述べる。下のセンテンス a)、b) の形容詞に下線をひきなさい。',
-    ex:[{t:"a)", s:"The watch is nice."},{t:"b)", s:"The baby is hungry now."}],
+    prompt:'形容詞は、名詞の a) 性質や b) 状態を述べる。下のセンテンス a)、b) の形容詞を書きなさい。',
+    ex:[{t:"a)", s:'The watch is nice.　<span class="tag">形容詞</span><span class="blank"></span>'},{t:"b)", s:'The baby is hungry now.　<span class="tag">形容詞</span><span class="blank"></span>'}],
     rows:[
       ["a) 性質", '<span class="pos adj">nice</span>'],
       ["b) 状態", '<span class="pos adj">hungry</span>']
@@ -499,8 +545,8 @@ const LESSONS = [
   },
   {
     sec:"5. 補語と品詞",
-    prompt:'補語は、主語についてそれが何か、またはどんな状態であるのかを補足説明した語。下のセンテンスのそれぞれの補語に下線をひき、それぞれに品詞名を書きなさい。',
-    ex:[{t:"", s:"Liz is a doctor."},{t:"", s:"They are very friendly."},{t:"", s:"The students are in the gym."}],
+    prompt:'補語は、主語についてそれが何か、またはどんな状態であるのかを補足説明した語。下のセンテンスのそれぞれの補語と、その品詞名を書きなさい。',
+    ex:[{t:"", s:'Liz is a doctor.　<span class="tag">補語</span><span class="blank"></span> <span class="tag">品詞</span><span class="blank"></span>'},{t:"", s:'They are very friendly.　<span class="tag">補語</span><span class="blank"></span> <span class="tag">品詞</span><span class="blank"></span>'},{t:"", s:'The students are in the gym.　<span class="tag">補語</span><span class="blank"></span> <span class="tag">品詞</span><span class="blank"></span>'}],
     rows:[
       ['<span class="en">Liz is …</span>', '<span class="pos n">a doctor</span><span class="chip n">名詞</span>'],
       ['<span class="en">They are …</span>', '<span class="pos adj">very friendly</span><span class="chip adj">形容詞</span>'],
@@ -663,8 +709,8 @@ const LESSONS = [
   },
   {
     sec:"2-3. 動詞＋目的語",
-    prompt:'目的語は、一般には動詞の表す<span class="blank"></span>（2語）・作用が及ぶ対象となる<span class="blank"></span>（品詞）。例文の目的語に下線を引きなさい。',
-    ex:[{t:"例文", s:"They study Chinese."}],
+    prompt:'目的語は、一般には動詞の表す<span class="blank"></span>（2語）・作用が及ぶ対象となる<span class="blank"></span>（品詞）。例文の目的語を書きなさい。',
+    ex:[{t:"例文", s:'They study Chinese.　<span class="tag">目的語</span><span class="blank"></span>'}],
     rows:[
       ["動詞の表すもの", '動作'],
       ["対象となる品詞", '名詞'],
@@ -2111,10 +2157,11 @@ const LESSONS = [
   },
   {
     sec:"2. see と look at",
-    prompt:'下のセンテンスで正しい方に丸をつけなさい。なぜ片方が不自然か説明しなさい。',
+    prompt:'下のセンテンスで正しい方の記号（a / b）を書きなさい。また、なぜ片方が不自然か説明しなさい。',
     ex:[
       {t:"a)", s:"He and I were able to see it this afternoon."},
-      {t:"b)", s:"He and I were able to look at it this afternoon."}
+      {t:"b)", s:"He and I were able to look at it this afternoon."},
+      {t:"", s:'<span class="tag">正しい方</span><span class="blank"></span>'}
     ],
     rows:[
       ["正しいのは", 'b) <span class="en">… were able to</span> <span class="pos v">look at</span> <span class="en">it …</span>'],
@@ -3795,8 +3842,8 @@ const LESSONS = [
   },
   {
     sec:"2-(6)2a) 従位接続詞—名詞節",
-    prompt:'下の英文の主節、従位接続詞、従属節のそれぞれに下線を引き、これら3つの別を示しなさい。',
-    ex:[{s:"The trouble is that my father is sick.", j:"問題は、私の父が病気なことです"}],
+    prompt:'下の英文の主節、従位接続詞、従属節をそれぞれ書きなさい。',
+    ex:[{s:"The trouble is that my father is sick.", j:"問題は、私の父が病気なことです"},{s:'<span class="tag">主節</span><span class="blank"></span> <span class="tag">従位接続詞</span><span class="blank"></span> <span class="tag">従属節</span><span class="blank"></span>'}],
     rows:[
       ["主節", '<span class="pos v">The trouble is …</span>'],
       ["従位接続詞", '<span class="pos adv">that</span>'],
@@ -3852,12 +3899,12 @@ const LESSONS = [
   },
   {
     sec:"1. ［先行詞＋関係副詞］のパターン",
-    prompt:'下の［先行詞＋関係副詞］のパターンで、可能なパターンに下線を引きなさい。',
+    prompt:'下の［先行詞＋関係副詞］のパターンのうち、可能なパターンをすべて書きなさい（カンマで区切って、示された順に）。',
     ex:[
-      {s:"the time と when：the time when, when, the time"},
-      {s:"the place と where：the place where, where, the place"},
-      {s:"the reason と why：the reason why, why, the reason"},
-      {s:"the way と how：the way how, how, the way"}
+      {s:'the time と when：the time when, when, the time　→ <span class="blank"></span>'},
+      {s:'the place と where：the place where, where, the place　→ <span class="blank"></span>'},
+      {s:'the reason と why：the reason why, why, the reason　→ <span class="blank"></span>'},
+      {s:'the way と how：the way how, how, the way　→ <span class="blank"></span>'}
     ],
     rows:[
       ['<span class="en">the time</span>', '<span class="pos adv">the time when</span> ／ <span class="pos adv">when</span> ／ <span class="pos adv">the time</span>（すべて可）'],
@@ -4450,12 +4497,12 @@ const LESSONS = [
   },
   {
     sec:"2. 副詞節を分詞句へ（現在分詞）",
-    prompt:'下の下線の部分を分詞を使って書き換えなさい。',
+    prompt:'下のセンテンスの副詞節（接続詞＋主語＋動詞の部分）を、分詞を使って書き換えなさい。書き換えた部分だけを書けば OK。',
     ex:[
-      {t:"a)", s:"He returned to his hometown after he finished his college."},
-      {t:"b)", s:"Before you buy a new car, you should do research on it."},
-      {t:"c)", s:"You should always keep facing the audience when you are giving your speech."},
-      {t:"d)", s:"You shouldn’t talk on the phone while you are driving."}
+      {t:"a)", s:'He returned to his hometown after he finished his college.<br>→ <span class="blank"></span>'},
+      {t:"b)", s:'Before you buy a new car, you should do research on it.<br>→ <span class="blank"></span>'},
+      {t:"c)", s:'You should always keep facing the audience when you are giving your speech.<br>→ <span class="blank"></span>'},
+      {t:"d)", s:'You shouldn’t talk on the phone while you are driving.<br>→ <span class="blank"></span>'}
     ],
     rows:[
       ['a)', '<span class="en">… hometown</span> <span class="pos adv">after finishing his college</span>.'],
@@ -4482,9 +4529,9 @@ const LESSONS = [
   },
   {
     sec:"2. 分詞で簡略化（過去分詞）",
-    prompt:'下のセンテンスの下線を分詞を使って簡略化し、<span class="blank"></span>に適切な語句を書きなさい。',
+    prompt:'「書き換え」の文の When 節を分詞を使って簡略化し、<span class="blank"></span>に適切な語句を書きなさい。',
     ex:[
-      {t:"書き換え", s:"When you are finished with the test, you can leave."},
+      {t:"書き換え", s:'When you are finished with the test, you can leave.　→ <span class="blank"></span>'},
       {s:'This rule would be applied <span class="blank"></span>.', j:"このルールは必要なときに適応されるでしょう"},
       {s:'This doesn’t work <span class="blank"></span> properly.', j:"適切に使わない限り、これは上手く働かない"},
       {s:'Take this medicine <span class="blank"></span>.', j:"必要があれば、この薬を飲みなさい"},
@@ -6109,27 +6156,107 @@ chaptersEl.innerHTML = CHAPTERS.map(c => {
   '</button>';
 }).join("");
 
+/* ===== 入力・採点ロジック ===== */
+const stripTags = h => String(h).replace(/<[^>]+>/g, " ");
+function norm(s){
+  return String(s).normalize("NFKC").toLowerCase()
+    .replace(/[’‘`´]/g, "'")
+    .replace(/[.,!?;:"“”「」『』。、・…()（）\[\]［］→＝=＋+\/|]/g, " ")
+    .replace(/[-–—~〜]/g, " ")
+    .replace(/\s+/g, " ").trim();
+}
+const isJa = s => /[^\x00-\x7f]/.test(s);
+const squash = s => s.replace(/\s/g, "");
+
+// 設問ごとのモデルアンサーの文字列プール
+const POOL = LESSONS.map(L => L.items.map(it => {
+  const parts = [];
+  it.rows.forEach(r => {
+    parts.push(stripTags(r[1]));
+    const dt = stripTags(r[0]).trim();
+    if (dt.length < 10 && /\d/.test(dt) && !/[a-z]/i.test(dt)) parts.push(dt);
+  });
+  const p = norm(parts.join(" | "));
+  return { sp: " " + p + " ", sq: squash(p) };
+}));
+
+function textMatch(ans, pool){
+  const a = norm(ans);
+  if (!a) return false;
+  if (isJa(a)) return pool.sq.includes(squash(a));
+  return pool.sp.includes(" " + a + " ");
+}
+
+// 自動判定が難しい選択肢の正解（null は自己採点）
+const PICK_FIX = { "1-5#1": [0, 1, null], "1-9#8": [0] };
+// 選択肢（A / B）の正解をモデルアンサーから順番に割り出す
+function solvePicks(li, i){
+  const it = LESSONS[li].items[i];
+  const html = it.prompt + it.ex.map(e => (e.s || "") + (e.j || "")).join("");
+  const groups = [...html.matchAll(/<span class="pick">([\s\S]*?)<\/span>/g)].map(m => stripTags(m[1]).split("/").map(s => s.trim()));
+  const fix = PICK_FIX[LESSONS[li].id + "#" + (i + 1)];
+  if (fix) return fix;
+  const pool = POOL[li][i].sq;
+  let cur = 0;
+  return groups.map(opts => {
+    const hits = opts.map((o, oi) => ({ oi, at: pool.indexOf(squash(norm(o)), cur), len: squash(norm(o)).length }))
+      .filter(h => h.at >= 0)
+      .sort((a, b) => a.at - b.at || b.len - a.len);
+    if (!hits.length) return null;
+    // 選択肢が1組だけで、両方の語が別々に答えに出る場合は自動採点しない
+    if (groups.length === 1 && hits.length > 1) {
+      const a = hits[0], b = hits[1];
+      const overlap = b.at < a.at + a.len;
+      if (!overlap || pool.indexOf(squash(norm(opts[b.oi])), a.at + a.len) >= 0) return null;
+    }
+    cur = hits[0].at + hits[0].len;
+    return hits[0].oi;
+  });
+}
+
+let bkSeq = 0;
+function inputs(html, cls){
+  return String(html)
+    .replace(/<span class="blank"><\/span>|（　　）/g, () =>
+      '<input class="bk' + (cls ? " " + cls : "") + '" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="解答欄" data-b="' + (bkSeq++) + '">')
+    .replace(/<span class="pick">([\s\S]*?)<\/span>/g, (m, inner) =>
+      '<span class="pk" role="group">' + stripTags(inner).split("/").map((o, oi) =>
+        '<button type="button" class="pk-o" aria-pressed="false" data-o="' + oi + '">' + o.trim() + '</button>').join('<span class="pk-s">/</span>') + '</span>');
+}
+
+const STATE = {};   // k -> "ok" | "ng" | undefined
+const PICKS = {};   // k -> 正解の選択肢番号の配列
+
 list.innerHTML = LESSONS.map((L, li) =>
   '<section class="lesson" id="lesson-' + li + '" ' + (li === 0 ? '' : 'hidden') + '>' +
   '<div class="items">' +
   L.items.map((it, i) => {
-    const rows = it.rows.map(r => '<div class="row"><dt>' + r[0] + '</dt><dd>' + r[1] + '</dd></div>').join("");
-    const ex = it.ex.map(e => '<p>' +
-      (e.t ? '<span class="tag">' + e.t + '</span>' : '') + e.s +
-      (e.j ? ' <span class="jp">「' + e.j + '」</span>' : '') + '</p>').join("");
     const k = li + '-' + i;
+    PICKS[k] = solvePicks(li, i);
+    const rows = it.rows.map(r => '<div class="row"><dt>' + r[0] + '</dt><dd>' + r[1] + '</dd></div>').join("");
+    // 「下の＿＿に〜書きなさい」のような指示文中の空欄は入力欄にしない
+    const promptHtml = inputs(it.prompt.replace(/(下の|中の|まるか|明文の|化し、|訳を、)<span class="blank"><\/span>(?=に)/g, '$1<span class="blank ref"></span>'), "jp-bk");
+    const ex = it.ex.map(e => '<p>' +
+      (e.t ? '<span class="tag">' + e.t + '</span>' : '') + inputs(e.s) +
+      (e.j ? ' <span class="jp">「' + inputs(e.j, "jp-bk") + '」</span>' : '') + '</p>').join("");
+    const hasInputs = /class="bk|class="pk"/.test(promptHtml + ex);
     return '' +
-    '<article class="item" id="item-' + k + '">' +
+    '<article class="item" id="item-' + k + '" data-k="' + k + '">' +
       '<div class="q">' +
         '<div class="q-head"><span class="num">' + (i + 1) + '</span><span class="sec">' + it.sec + '</span></div>' +
-        '<p class="prompt">' + it.prompt + '</p>' +
+        '<p class="prompt">' + promptHtml + '</p>' +
         '<div class="ex">' + ex + '</div>' +
-        '<button class="reveal" type="button" id="btn-' + k + '" aria-expanded="false" aria-controls="ans-' + k + '" data-k="' + k + '">答えを見る</button>' +
+        (hasInputs ? '' : '<textarea class="free" rows="3" placeholder="ここに答えを書いてください" aria-label="解答欄"></textarea>') +
+        '<div class="actions">' +
+          '<button class="check" type="button" data-act="check">答え合わせ</button>' +
+          '<button class="model" type="button" data-act="model" aria-expanded="false" aria-controls="ans-' + k + '">モデルアンサー</button>' +
+        '</div>' +
+        '<div class="verdict" id="vd-' + k + '" aria-live="polite"></div>' +
       '</div>' +
       '<aside class="a">' +
-        '<div class="placeholder" id="ph-' + k + '">答えは隠れています</div>' +
+        '<div class="placeholder" id="ph-' + k + '">答えを入力して「答え合わせ」<br>正解は「モデルアンサー」で表示</div>' +
         '<div class="answer" id="ans-' + k + '" hidden>' +
-          '<p class="a-label">ANSWER</p>' +
+          '<p class="a-label">MODEL ANSWER</p>' +
           '<dl class="rows">' + rows + '</dl>' +
           (it.note ? '<p class="note">' + it.note + '</p>' : '') +
         '</div>' +
@@ -6139,34 +6266,117 @@ list.innerHTML = LESSONS.map((L, li) =>
   '</div></section>'
 ).join("");
 
-function setOpen(k, open){
+function setModel(k, open){
   const item = document.getElementById("item-" + k);
-  const btn = document.getElementById("btn-" + k);
+  const btn = item.querySelector('[data-act="model"]');
   const ans = document.getElementById("ans-" + k);
-  const ph = document.getElementById("ph-" + k);
+  document.getElementById("ph-" + k).hidden = open;
   ans.hidden = !open;
-  ph.hidden = open;
-  btn.textContent = open ? "答えを隠す" : "答えを見る";
+  btn.textContent = open ? "モデルアンサーを隠す" : "モデルアンサー";
   btn.setAttribute("aria-expanded", String(open));
-  item.classList.toggle("done", open);
   if (open) { ans.style.animation = "none"; void ans.offsetWidth; ans.style.animation = ""; }
+  // 自動採点できない設問は、モデルアンサーを見てから自己採点
+  if (open && isSelfOnly(k) && !STATE[k]) showSelf(k);
+}
+
+function isSelfOnly(k){
+  const item = document.getElementById("item-" + k);
+  const gradablePicks = (PICKS[k] || []).some(v => v !== null);
+  return !item.querySelector(".bk") && !gradablePicks;
+}
+
+function setState(k, s){
+  STATE[k] = s;
+  const item = document.getElementById("item-" + k);
+  item.classList.toggle("done", !!s);
+  item.classList.toggle("ok", s === "ok");
+  item.classList.toggle("ng", s === "ng");
   tally();
 }
 
+function showSelf(k, lead){
+  document.getElementById("vd-" + k).innerHTML =
+    (lead ? '<span class="v-msg">' + lead + '</span>' : '<span class="v-msg">モデルアンサーと比べて自己採点：</span>') +
+    '<button type="button" class="self ok" data-act="selfok">○ できた</button>' +
+    '<button type="button" class="self ng" data-act="selfng">✕ まだ</button>';
+}
+
+function check(k){
+  const item = document.getElementById("item-" + k);
+  const [li, i] = k.split("-").map(Number);
+  const pool = POOL[li][i];
+  if (isSelfOnly(k)) {
+    setModel(k, true);
+    showSelf(k);
+    return;
+  }
+  let total = 0, right = 0, empty = 0;
+  item.querySelectorAll(".bk").forEach(inp => {
+    total++;
+    const v = inp.value.trim();
+    if (!v) empty++;
+    const ok = textMatch(v, pool);
+    inp.classList.toggle("ok", ok);
+    inp.classList.toggle("ng", !ok);
+    if (ok) right++;
+  });
+  item.querySelectorAll(".pk").forEach((g, gi) => {
+    const ans = PICKS[k][gi];
+    const opts = g.querySelectorAll(".pk-o");
+    opts.forEach(o => o.classList.remove("ok", "ng", "is-ans"));
+    if (ans === null || ans === undefined) return;
+    total++;
+    const sel = g.querySelector('.pk-o[aria-pressed="true"]');
+    if (!sel) empty++;
+    if (sel && Number(sel.dataset.o) === ans) { right++; sel.classList.add("ok"); }
+    else if (sel) sel.classList.add("ng");
+  });
+  const vd = document.getElementById("vd-" + k);
+  if (right === total) {
+    vd.innerHTML = '<span class="v-ok">◎ 正解！</span>';
+    setState(k, "ok");
+  } else {
+    vd.innerHTML = '<span class="v-ng">△ ' + right + ' / ' + total + ' 正解</span>' +
+      '<span class="v-msg">' + (empty ? '空欄があります。' : '') + '赤い欄を見直すか「モデルアンサー」で確認。言い方が違うだけなら →</span>' +
+      '<button type="button" class="self ok" data-act="selfok">正解にする</button>';
+    setState(k, "ng");
+  }
+}
+
+function clearItem(k){
+  const item = document.getElementById("item-" + k);
+  item.querySelectorAll(".bk").forEach(inp => { inp.value = ""; inp.classList.remove("ok", "ng"); grow(inp); });
+  item.querySelectorAll(".pk-o").forEach(o => { o.setAttribute("aria-pressed", "false"); o.classList.remove("ok", "ng"); });
+  const f = item.querySelector(".free"); if (f) f.value = "";
+  document.getElementById("vd-" + k).innerHTML = "";
+  setModel(k, false);
+  setState(k, undefined);
+}
+
+function grow(inp){
+  const n = Math.max(inp.value.length, 0);
+  const ja = isJa(inp.value);
+  inp.style.width = n ? "calc(" + (ja ? n * 1.05 : n * 0.58) + "em + 22px)" : "";
+}
+
 function tally(){
-  const scope = document.getElementById("lesson-" + active);
   const total = LESSONS[active].items.length;
-  const n = scope.querySelectorAll(".item.done").length;
-  doneEl.textContent = n;
+  let ok = 0, done = 0;
+  for (let i = 0; i < total; i++) {
+    const s = STATE[active + "-" + i];
+    if (s) done++;
+    if (s === "ok") ok++;
+  }
+  doneEl.textContent = ok;
   totalEl.textContent = total;
-  barEl.style.width = (n / total * 100) + "%";
+  document.getElementById("graded").textContent = done;
+  barEl.style.width = (ok / total * 100) + "%";
   const chip = document.getElementById("chip-" + active);
-  if (chip) chip.classList.toggle("seen", n === total);
+  if (chip) chip.classList.toggle("seen", ok === total);
 }
 
 function lessonDone(li){
-  const scope = document.getElementById("lesson-" + li);
-  return scope.querySelectorAll(".item.done").length === LESSONS[li].items.length;
+  return LESSONS[li].items.every((_, i) => STATE[li + "-" + i] === "ok");
 }
 
 function renderChips(){
@@ -6209,22 +6419,57 @@ chipsEl.addEventListener("click", e => {
 });
 
 list.addEventListener("click", e => {
-  const btn = e.target.closest(".reveal");
-  if (!btn) return;
-  const k = btn.dataset.k;
-  setOpen(k, document.getElementById("ans-" + k).hidden);
+  const pk = e.target.closest(".pk-o");
+  if (pk) {
+    pk.closest(".pk").querySelectorAll(".pk-o").forEach(o => {
+      o.setAttribute("aria-pressed", String(o === pk));
+      o.classList.remove("ok", "ng");
+    });
+    return;
+  }
+  const b = e.target.closest("[data-act]");
+  if (!b) return;
+  const k = b.closest(".item").dataset.k;
+  const act = b.dataset.act;
+  if (act === "check") check(k);
+  else if (act === "model") setModel(k, document.getElementById("ans-" + k).hidden);
+  else if (act === "selfok") { setState(k, "ok"); document.getElementById("vd-" + k).innerHTML = '<span class="v-ok">◎ 正解として記録しました</span>'; }
+  else if (act === "selfng") { setState(k, "ng"); document.getElementById("vd-" + k).innerHTML = '<span class="v-ng">✕ もう一度チャレンジしよう</span>'; }
+});
+
+list.addEventListener("input", e => {
+  if (e.target.classList.contains("bk")) {
+    e.target.classList.remove("ok", "ng");
+    grow(e.target);
+  }
+});
+
+// Enter で答え合わせ（日本語変換中の Enter は無視）
+list.addEventListener("keydown", e => {
+  if (e.key !== "Enter" || e.isComposing || e.keyCode === 229) return;
+  if (!e.target.classList.contains("bk")) return;
+  e.preventDefault();
+  const item = e.target.closest(".item");
+  const all = [...item.querySelectorAll(".bk")];
+  const next = all[all.indexOf(e.target) + 1];
+  if (next) next.focus(); else check(item.dataset.k);
 });
 
 document.getElementById("showAll").addEventListener("click", () => {
-  LESSONS[active].items.forEach((_, i) => setOpen(active + "-" + i, true));
+  LESSONS[active].items.forEach((_, i) => setModel(active + "-" + i, true));
 });
 document.getElementById("hideAll").addEventListener("click", () => {
-  LESSONS[active].items.forEach((_, i) => setOpen(active + "-" + i, false));
+  LESSONS[active].items.forEach((_, i) => setModel(active + "-" + i, false));
+});
+document.getElementById("checkAll").addEventListener("click", () => {
+  LESSONS[active].items.forEach((_, i) => { const k = active + "-" + i; if (!isSelfOnly(k)) check(k); });
+});
+document.getElementById("resetAll").addEventListener("click", () => {
+  { const rb = document.getElementById("resetAll"); if (!rb.dataset.armed) { rb.dataset.armed = "1"; const t = rb.textContent; rb.textContent = "もう一度押すと消去"; setTimeout(() => { delete rb.dataset.armed; rb.textContent = t; }, 3000); return; } delete rb.dataset.armed; rb.textContent = "リセット"; }
+  LESSONS[active].items.forEach((_, i) => clearItem(active + "-" + i));
 });
 
 selectLesson(0);
-// 最初の1問だけ開いた状態で見せて、使い方が一目で分かるようにする
-setOpen("0-0", true);
 
 /* ---------- theme toggle (初期表示はライト) ---------- */
 (function(){
